@@ -36,6 +36,7 @@ NATIVE_JAVA_CLASSES = \
 	org.rocksdb.HashLinkedListMemTableConfig\
 	org.rocksdb.HashSkipListMemTableConfig\
 	org.rocksdb.HdfsEnv\
+        org.rocksdb.SpdkEnv\
 	org.rocksdb.Logger\
 	org.rocksdb.LRUCache\
 	org.rocksdb.MemoryUsageType\
