@@ -16,6 +16,7 @@
 #include "include/org_rocksdb_RocksEnv.h"
 #include "include/org_rocksdb_RocksMemEnv.h"
 #include "include/org_rocksdb_TimedEnv.h"
+#include "include/org_rocksdb_SpdkEnv.h"
 
 /*
  * Class:     org_rocksdb_Env
@@ -234,5 +235,60 @@ void Java_org_rocksdb_TimedEnv_disposeInternal(
   auto* e = reinterpret_cast<ROCKSDB_NAMESPACE::Env*>(jhandle);
   assert(e != nullptr);
   delete e;
+}
+
+/*
+ * Class:     org_rocksdb_SpdkEnv
+ * Method:    createSpdkEnv
+ * Signature: (J;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)J
+ */
+jlong Java_org_rocksdb_SpdkEnv_createSpdkEnv(
+        JNIEnv* env, jclass, jlong jbase_env_handle, jstring db_name,
+        jstring conf_name, jstring bdev_name, jint spdk_cache_size) {
+    jboolean has_exception = JNI_FALSE;
+    auto* base_env = reinterpret_cast<ROCKSDB_NAMESPACE::Env*>(jbase_env_handle);
+    auto dbname =
+            ROCKSDB_NAMESPACE::JniUtil::copyStdString(env, db_name, &has_exception);
+    if (has_exception == JNI_TRUE) {
+        // exception occurred
+        return 0;
+    }
+    auto confname =
+            ROCKSDB_NAMESPACE::JniUtil::copyStdString(env, conf_name, &has_exception);
+    if (has_exception == JNI_TRUE) {
+        // exception occurred
+        return 0;
+    }
+    auto bdevname =
+            ROCKSDB_NAMESPACE::JniUtil::copyStdString(env, bdev_name, &has_exception);
+    if (has_exception == JNI_TRUE) {
+        // exception occurred
+        return 0;
+    }
+    if (has_exception == JNI_TRUE) {
+        // exception occurred
+        return 0;
+    }
+    ROCKSDB_NAMESPACE::Env* spdk_env =
+            ROCKSDB_NAMESPACE::NewSpdkEnv(base_env, dbname, confname, bdevname, spdk_cache_size);
+    if (spdk_env == NULL) {
+        // error occurred
+        ROCKSDB_NAMESPACE::RocksDBExceptionJni::ThrowNew(env,
+                "Could not create spdk env");
+        return 0;
+    }
+    return reinterpret_cast<jlong>(spdk_env);
+}
+
+/*
+ * Class:     org_rocksdb_SpdkEnv
+ * Method:    disposeInternal
+ * Signature: (J)V
+ */
+void Java_org_rocksdb_SpdkEnv_disposeInternal(
+        JNIEnv*, jobject, jlong jhandle) {
+    auto* e = reinterpret_cast<ROCKSDB_NAMESPACE::Env*>(jhandle);
+    assert(e != nullptr);
+    delete e;
 }
 
